@@ -312,6 +312,7 @@ func nodeTypes(schemas *types.Schemas) *types.Schemas {
 			m.DisplayName{}).
 		AddMapperForType(&Version, v3.NodeDriver{}, m.DisplayName{}).
 		AddMapperForType(&Version, v3.NodeTemplate{}, m.DisplayName{}).
+		AddMapperForType(&Version, v3.NodeTemplateTerraform{}, m.DisplayName{}).
 		MustImport(&Version, v3.PublicEndpoint{}).
 		MustImport(&Version, v3.NodePool{}).
 		MustImport(&Version, v3.NodeDrainInput{}).
@@ -345,6 +346,9 @@ func nodeTypes(schemas *types.Schemas) *types.Schemas {
 			}
 		}).
 		MustImportAndCustomize(&Version, v3.NodeTemplate{}, func(schema *types.Schema) {
+			delete(schema.ResourceFields, "namespaceId")
+		}).
+		MustImportAndCustomize(&Version, v3.NodeTemplateTerraform{}, func(schema *types.Schema) {
 			delete(schema.ResourceFields, "namespaceId")
 		})
 }

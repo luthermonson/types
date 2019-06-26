@@ -47,6 +47,48 @@ type NodeTemplateSpec struct {
 	NodeCommonParams    `json:",inline"`
 }
 
+type NodeTemplateTerraform struct {
+	types.Namespaced
+
+	metav1.TypeMeta `json:",inline"`
+	// Standard object’s metadata. More info:
+	// https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#metadata
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	// Specification of the desired behavior of the the cluster. More info:
+	// https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#spec-and-status
+	Spec NodeTemplateTerraformSpec `json:"spec"`
+	// Most recent observed status of the cluster. More info:
+	// https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#spec-and-status
+	Status NodeTemplateTerraformStatus `json:"status"`
+}
+
+type NodeTemplateTerraformStatus struct {
+	Conditions []NodeTemplateCondition `json:"conditions"`
+}
+
+type NodeTemplateTerraformCondition struct {
+	// Type of cluster condition.
+	Type string `json:"type"`
+	// Status of the condition, one of True, False, Unknown.
+	Status v1.ConditionStatus `json:"status"`
+	// The last time this condition was updated.
+	LastUpdateTime string `json:"lastUpdateTime,omitempty"`
+	// Last time the condition transitioned from one status to another.
+	LastTransitionTime string `json:"lastTransitionTime,omitempty"`
+	// The reason for the condition's last transition.
+	Reason string `json:"reason,omitempty"`
+}
+
+type NodeTemplateTerraformSpec struct {
+	DisplayName string `json:"displayName"`
+	Description string `json:"description"`
+	ModuleName  string `json:"moduleName"`
+	//Git                 tfv1.GitLocation `json:"git,omitempty"`
+	Driver              string `json:"driver" norman:"nocreate,noupdate"`
+	CloudCredentialName string `json:"cloudCredentialName" norman:"type=reference[cloudCredential]"`
+	NodeCommonParams    `json:",inline"`
+}
+
 type Node struct {
 	types.Namespaced
 
@@ -140,10 +182,11 @@ type NodePool struct {
 }
 
 type NodePoolSpec struct {
-	Etcd             bool   `json:"etcd"`
-	ControlPlane     bool   `json:"controlPlane"`
-	Worker           bool   `json:"worker"`
-	NodeTemplateName string `json:"nodeTemplateName,omitempty" norman:"type=reference[nodeTemplate],required,notnullable"`
+	Etcd                      bool   `json:"etcd"`
+	ControlPlane              bool   `json:"controlPlane"`
+	Worker                    bool   `json:"worker"`
+	NodeTemplateName          string `json:"nodeTemplateName,omitempty" norman:"type=reference[nodeTemplate],required,notnullable"`
+	NodeTemplateTerraformName string `json:"nodeTemplateTerraformName,omitempty" norman:"type=reference[nodeTemplateTerraform],nullable"`
 
 	HostnamePrefix  string            `json:"hostnamePrefix" norman:"required,notnullable"`
 	Quantity        int               `json:"quantity" norman:"required,default=1"`

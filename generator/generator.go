@@ -120,11 +120,29 @@ func GenerateNativeTypes(gv schema.GroupVersion, nsObjs []interface{}, objs []in
 	}
 
 	k8sOutputPackage := path.Join(basePackage, baseK8s, groupPath, version)
-
 	if err := generator.GenerateControllerForTypes(&types.APIVersion{
 		Version: version,
 		Group:   group,
 		Path:    fmt.Sprintf("/k8s/%s-%s", groupPath, version),
+	}, k8sOutputPackage, nsObjs, objs); err != nil {
+		panic(err)
+	}
+}
+
+func GenerateTypes(gv schema.GroupVersion, nsObjs []interface{}, objs []interface{}) {
+	version := gv.Version
+	group := gv.Group
+	groupPath := group
+
+	if groupPath == "" {
+		groupPath = "core"
+	}
+
+	k8sOutputPackage := path.Join(basePackage, baseK8s, groupPath, version)
+	if err := generator.GenerateControllerForTypes(&types.APIVersion{
+		Version: version,
+		Group:   group,
+		Path:    fmt.Sprintf("/%s-%s", groupPath, version),
 	}, k8sOutputPackage, nsObjs, objs); err != nil {
 		panic(err)
 	}
